@@ -1,7 +1,7 @@
 //import logo from './logo.svg';
 import funny_meme from "./images/funny_meme.jpg"
 import funny_meme_2 from "./images/funny_meme2.jpg"
-import good_boy from "./images/good_boy.jpg"
+import good_boy from "./images/good_Boy.jpg"
 import './App.css';
 
 function App() {
