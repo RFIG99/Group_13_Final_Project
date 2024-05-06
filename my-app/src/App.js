@@ -1,6 +1,7 @@
 //import logo from './logo.svg';
 import funny_meme from "./images/funny_meme.jpg"
 import funny_meme_2 from "./images/funny_meme2.jpg"
+import good_boy from "./images/good_boy.jpg"
 import './App.css';
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
 <h1>Life</h1>
 </div>
 
-<p>I have lived in San Bernardino my whole life. I attended Cajon High School and San Bernardino Valley College Before I came to CSUSB. In high school, I played water polo and was on the swim team. </p>
+<p>I have lived in San Bernardino my whole life. I attended Cajon High School and San Bernardino Valley College as a student before I came to CSUSB. In high school, I played water polo and was on the swim team. </p>
 
 
 <div class = "paraHDR">
@@ -34,6 +35,13 @@ function App() {
 </div>
 
 <p>I like to play Arkham Batman series of games. I also like to play Metal Gear Solid 5 and games from the Legend of Zelda series. I also play Halo Master Chief Collection and Mortal Kombat 11.</p>
+
+
+<div class = "paraHDR">
+<h1>Extra</h1>
+</div>
+
+<p> .</p>
 </div>
 
 <div class = "image">
@@ -42,6 +50,7 @@ function App() {
 
 <img id='funny_meme_2' src={funny_meme_2} alt="Funny meme go here" ></img>
 
+<img id='good_boy' src={good_boy} alt="good boy" ></img>
 
 </div>
 
