@@ -36,12 +36,14 @@ function App() {
 
 <p>I like to play Arkham Batman series of games. I also like to play Metal Gear Solid 5 and games from the Legend of Zelda series. I also play Halo Master Chief Collection and Mortal Kombat 11.</p>
 
-
 <div class = "paraHDR">
 <h1>Extra</h1>
 </div>
 
-<p> .</p>
+<p> The bee movie was weird.</p>
+<p> The foods, tacos, sushi, and pizza taste good.</p>
+<p> How much wood would a woodchuck chuck if a woodchuck could chuck wood? He would chuck, he would, as much as he could, and chuck as much wood as a woodchuck would if a woodchuck could chuck wood.</p>
+<p> Sally sells seashells by the seashore.</p>
 </div>
 
 <div class = "image">
