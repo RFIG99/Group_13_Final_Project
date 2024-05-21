@@ -16,27 +16,27 @@ def initialize_firebase():
         firebase_admin.initialize_app(cred)
     return firestore.client()
 
-# Function to write metrics to Firestore
-def write_to_firestore(db, metrics):
-    # Add a new document with a generated ID
-    doc_ref = db.collection(u'metrics').add(metrics)
-    print(f"Document added with ID: {doc_ref.id}")
+# Function to write metrics to Firestore with a specific document ID
+def write_to_firestore(db, metrics, document_id):
+    # Set the document reference with the specified document ID
+    doc_ref = db.collection(u'metrics').document(document_id)
+    # Set the document data
+    doc_ref.set(metrics)
+    print(f"Metrics added to document with ID: {document_id}")
 
 # Function to write metrics to CSV
 def write_to_csv(filename, metrics):
-    # Extracting the first value from each metric
-    iterations = [metric["Iteration"][0] for metric in metrics]
-    groups = [metric["Group"][0] for metric in metrics]
-    users = [metric["User"][0] for metric in metrics]
-    presence_times = [metric["Presence time (Seconds)"][0] for metric in metrics]
-
-    # Writing the metrics as columns
+    # Writing the metrics as rows in the CSV file
     with open(filename, mode="w", newline="") as fp:
         writer = csv.writer(fp)
-        writer.writerow(["Iteration"] + iterations)
-        writer.writerow(["Group"] + groups)
-        writer.writerow(["User"] + users)
-        writer.writerow(["Presence time (Seconds)"] + presence_times)
+        writer.writerow(["User", "Group", "Iteration", "Presence time (Seconds)"])
+        for i in range(len(metrics["User"])):
+            writer.writerow([
+                metrics["User"][i],
+                metrics["Group"][i],
+                metrics["Iteration"][i],
+                metrics["Presence time (Seconds)"][i]
+            ])
 
 # Function to get user scripts based on group
 def get_user_scripts(group):
@@ -49,7 +49,7 @@ def get_user_scripts(group):
 
     return [script for script in os.listdir(group_dir) if script.endswith('.py')]
 
-def main(user_scripts, group):
+def main(db, user_scripts, group, document_id):
     # Define the group directory based on the value of the group argument
     if group == 'control':
         group_dir = 'Control_Group'
@@ -71,8 +71,11 @@ def main(user_scripts, group):
         db = initialize_firebase()
 
         try:
-            # Set iteration directly to 1
-            iteration = 1
+            driver.get("http://localhost:3000/")
+            
+            # Set iteration directly to 0
+            iteration = 4
+
             presence_time = time.time() - start_time
 
             metrics["Iteration"].append(iteration)
@@ -80,10 +83,11 @@ def main(user_scripts, group):
             metrics["User"].append(user_script)
             metrics["Presence time (Seconds)"].append(presence_time)
 
-            print("Iteration:", metrics["Iteration"][0])
-            print("Group:", metrics["Group"][0])
-            print("User:", metrics["User"][0])
-            print("Presence time (Seconds):", metrics["Presence time (Seconds)"][0])
+            print("Iteration:", iteration)  # Print only the current iteration number
+            print("Group:", ", ".join(map(str, metrics["Group"])))
+            print("User:", ", ".join(map(str, metrics["User"])))
+            print("Presence time (Seconds):", ", ".join(map(str, metrics["Presence time (Seconds)"])))
+
 
             # Dynamically import the user script based on the file name
             module_name = os.path.splitext(user_script)[0]  # Remove the file extension
@@ -106,16 +110,26 @@ def main(user_scripts, group):
 
         # Append metrics for the current user script to all_metrics
         for key, value in metrics.items():
-            all_metrics[key].extend(value)
+            all_metrics[key].extend(value)  # Append to all_metrics, not metrics
         print(f"Metrics collected for user script: {user_script}")
 
-    # Write all metrics to Firestore
-    db = initialize_firebase()
-    doc_ref = db.collection(u'metrics').add(dict(all_metrics))
-    print(f"Document added with ID: {doc_ref[1].id}")
+    # Calculate average presence time
+    total_presence_time = sum(all_metrics["Presence time (Seconds)"])
+    average_presence_time = total_presence_time / len(all_metrics["Presence time (Seconds)"])
+
+  
+  
+
+
+    # Write average presence time to Firestore
+    db.collection(u'metrics').document(document_id).update({u"Average_Presence_Time": average_presence_time})
+    print("Average Presence Time written to Firestore.")
+
+    # Write all metrics to Firestore with the specified document ID
+    write_to_firestore(db, all_metrics, document_id)
 
     # Write all metrics to a single CSV file named "metrics.csv"
-    write_to_csv("metrics.csv", [dict(all_metrics)])
+    write_to_csv("metrics.csv", all_metrics)
     print("All metrics recorded and stored successfully in metrics.csv")
 
 if __name__ == "__main__":
@@ -129,6 +143,11 @@ if __name__ == "__main__":
     # Get a list of all user scripts under the specified group directory
     user_scripts = get_user_scripts(group)
 
-    # Now, pass the user scripts and the group to the main function
-    main(user_scripts, group)
+    # Initialize Firebase
+    db = initialize_firebase()
 
+    # Specify the document ID to write to
+    document_id = "finaliteration"
+
+    # Now, pass the user scripts, group, Firebase database, and document ID to the main function
+    main(db, user_scripts, group, document_id)

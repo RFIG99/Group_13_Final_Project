@@ -13,15 +13,13 @@ def calculate_presence_time(file_path):
         for row in reader:
             try:
                 # Extracting the presence time as a list
-                presence_time_list = ast.literal_eval(row["Presence time (Seconds)"])
-                
-                # Converting the list to a float
-                presence_time = float(presence_time_list[0])
+                presence_time_str = row["Presence time (Seconds)"]
+                presence_time = float(presence_time_str.strip('[]'))
                 
                 total_presence_time += presence_time
                 total_users += 1
-            except (ValueError, SyntaxError) as e:
-                print(f"Error: Presence time value is not a valid number. Skipping this row. Error details: {e}")
+            except (ValueError, KeyError) as e:
+                print(f"Error: Presence time value is not valid or column not found. Skipping this row. Error details: {e}")
 
     # Calculate the average presence time
     if total_users > 0:
@@ -40,4 +38,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
